@@ -441,5 +441,148 @@ As we saw above, Consistent Hashing helps with efficiently partitioning and repl
 Amazon’s Dynamo and Apache Cassandra use Consistent Hashing to distribute and replicate data across nodes.
 
 
+# Long-Polling vs WebSockets vs Server-Sent Events
 
+Long-Polling, WebSockets, and Server-Sent Events are popular communication protocols between a client like a web browser and a web server. First, let’s start with understanding what a standard HTTP web request looks like. Following are a sequence of events for regular HTTP request:
+
+- The client opens a connection and requests data from the server.
+- The server calculates the response.
+- The server sends the response back to the client on the opened request.
+
+## Ajax Polling
+
+Polling is a standard technique used by the vast majority of AJAX applications. The basic idea is that the client repeatedly polls (or requests) a server for data. The client makes a request and waits for the server to respond with data. If no data is available, an empty response is returned.
+
+- The client opens a connection and requests data from the server using regular HTTP.
+- The requested webpage sends requests to the server at regular intervals (e.g., 0.5 seconds).
+- The server calculates the response and sends it back, just like regular HTTP traffic.
+- The client repeats the above three steps periodically to get updates from the server.
+
+The problem with Polling is that the client has to keep asking the server for any new data. As a result, a lot of responses are empty, creating HTTP overhead.
+
+## HTTP Long-Polling
+
+This is a variation of the traditional polling technique that allows the server to push information to a client whenever the data is available. With Long-Polling, the client requests information from the server exactly as in normal polling, but with the expectation that the server may not respond immediately. That’s why this technique is sometimes referred to as a “Hanging GET”.
+
+- If the server does not have any data available for the client, instead of sending an empty response, the server holds the request and waits until some data becomes available.
+- Once the data becomes available, a full response is sent to the client. The client then immediately re-request information from the server so that the server will almost always have an available waiting request that it can use to deliver data in response to an event.
+
+The basic life cycle of an application using HTTP Long-Polling is as follows:
+
+- The client makes an initial request using regular HTTP and then waits for a response.
+- The server delays its response until an update is available or a timeout has occurred.
+- When an update is available, the server sends a full response to the client.
+- The client typically sends a new long-poll request, either immediately upon receiving a response or after a pause to allow an acceptable latency period.
+- Each Long-Poll request has a timeout. The client has to reconnect periodically after the connection is closed due to timeouts.
+
+## WebSockets
+
+WebSocket provides Full duplex communication channels over a single TCP connection. It provides a persistent connection between a client and a server that both parties can use to start sending data at any time. The client establishes a WebSocket connection through a process known as the WebSocket handshake. If the process succeeds, then the server and client can exchange data in both directions at any time. The WebSocket protocol enables communication between a client and a server with lower overheads, facilitating real-time data transfer from and to the server. This is made possible by providing a standardized way for the server to send content to the browser without being asked by the client and allowing for messages to be passed back and forth while keeping the connection open. In this way, a two-way (bi-directional) ongoing conversation can take place between a client and a server.
+
+## Server-Sent Events (SSEs)
+
+Under SSEs the client establishes a persistent and long-term connection with the server. The server uses this connection to send data to a client. If the client wants to send data to the server, it would require the use of another technology/protocol to do so.
+
+- Client requests data from a server using regular HTTP.
+- The requested webpage opens a connection to the server.
+- The server sends the data to the client whenever there’s new information available.
+
+SSEs are best when we need real-time traffic from the server to the client or if the server is generating data in a loop and will be sending multiple events to the client.
+
+# Bloom Filters (New)
+
+## Background
+
+If we have a large set of structured data (identified by record IDs) stored in a set of data files, what is the most efficient way to know which file might contain our required data? We don’t want to read each file, as that would be slow, and we have to read a lot of data from the disk. One solution can be to build an index on each data file and store it in a separate index file. This index can map each record ID to its offset in the data file. Each index file will be sorted on the record ID. Now, if we want to search an ID in this index, the best we can do is a Binary Search. Can we do better than that?
+
+## Solution
+
+Use Bloom filters to quickly find if an element might be present in a set.
+
+The Bloom filter data structure tells whether an element may be in a set, or definitely is not. The only possible errors are false positives, i.e., a search for a nonexistent element might give an incorrect answer. With more elements in the filter, the error rate increases. An empty Bloom filter is a bit-array of m bits, all set to 0. There are also k different hash functions, each of which maps a set element to one of the m bit positions.
+
+- To add an element, feed it to the hash functions to get k bit positions, and set the bits at these positions to 1.
+- To test if an element is in the set, feed it to the hash functions to get k bit positions.
+    - If any of the bits at these positions is 0, the element is definitely not in the set.
+    - If all are 1, then the element may be in the set.
+
+Here is a Bloom filter with three elements P, Q, and R. It consists of 20 bits and uses three hash functions. The colored arrows point to the bits that the elements of the set are mapped to.
+
+
+- The element X definitely is not in the set, since it hashes to a bit position containing 0.
+- For a fixed error rate, adding a new element and testing for membership are both constant time operations, and a filter with room for ‘n’ elements requires O(n)O(n) space.
+
+
+# Quorum (New)
+
+## Background
+
+In Distributed Systems, data is replicated across multiple servers for fault tolerance and high availability. Once a system decides to maintain multiple copies of data, another problem arises: how to make sure that all replicas are consistent, i.e., if they all have the latest copy of the data and that all clients see the same view of the data?
+
+## Solution
+
+In a distributed environment, a quorum is the minimum number of servers on which a distributed operation needs to be performed successfully before declaring the operation’s overall success.
+
+Suppose a database is replicated on five machines. In that case, quorum refers to the minimum number of machines that perform the same action (commit or abort) for a given transaction in order to decide the final operation for that transaction. So, in a set of 5 machines, three machines form the majority quorum, and if they agree, we will commit that operation. Quorum enforces the consistency requirement needed for distributed operations.
+
+In systems with multiple replicas, there is a possibility that the user reads inconsistent data. For example, when there are three replicas, R1, R2, and R3 in a cluster, and a user writes value v1 to replica R1. Then another user reads from replica R2 or R3 which are still behind R1 and thus will not have the value v1, so the second user will not get the consistent state of data.
+
+**What value should we choose for a quorum?** More than half of the number of nodes in the cluster: (N/2+1)(N/2+1) where NN is the total number of nodes in the cluster, for example:
+
+- In a 5-node cluster, three nodes must be online to have a majority.
+- In a 4-node cluster, three nodes must be online to have a majority.
+- With 5-node, the system can afford two node failures, whereas, with 4-node, it can afford only one node failure. Because of this logic, it is recommended to always have an odd number of total nodes in the cluster.
+
+Quorum is achieved when nodes follow the below protocol: `R+W > N`, where:
+N = nodes in the quorum group
+W = minimum write nodes
+R = minimum read nodes
+
+If a distributed system follows R+W>NR+W>N rule, then every read will see at least one copy of the latest value written. For example, a common configuration could be (N=3, W=2, R=2) to ensure strong consistency. Here are a couple of other examples:
+
+- (N=3, W=1, R=3): fast write, slow read, not very durable
+- (N=3, W=3, R=1): slow write, fast read, durable
+
+The following two things should be kept in mind before deciding read/write quorum:
+
+- R=1 and W=N ⇒ full replication (write-all, read-one): undesirable when servers can be unavailable because writes are not guaranteed to complete.
+- Best performance (throughput/availability) when 1<r<w<n, because reads are more frequent than writes in most applications
+
+# Leader and Follower (New)
+
+## Background
+
+Distributed systems keep multiple copies of data for fault tolerance and higher availability. A system can use quorum to ensure data consistency between replicas, i.e., all reads and writes are not considered successful until a majority of nodes participate in the operation. However, using quorum can lead to another problem, that is, lower availability; at any time, the system needs to ensure that at least a majority of replicas are up and available, otherwise the operation will fail. Quorum is also not sufficient, as in certain failure scenarios, the client can still see inconsistent data.
+
+## Solution
+
+Allow only a single server (called leader) to be responsible for data replication and to coordinate work.
+
+At any time, one server is elected as the leader. This leader becomes responsible for data replication and can act as the central point for all coordination. The followers only accept writes from the leader and serve as a backup. In case the leader fails, one of the followers can become the leader. In some cases, the follower can serve read requests for load balancing.
+
+# Heartbeat (New)
+
+## Background
+
+In a distributed environment, work/data is distributed among servers. To efficiently route requests in such a setup, servers need to know what other servers are part of the system. Furthermore, servers should know if other servers are alive and working. In a decentralized system, whenever a request arrives at a server, the server should have enough information to decide which server is responsible for entertaining that request. This makes the timely detection of server failure an important task, which also enables the system to take corrective actions and move the data/work to another healthy server and stop the environment from further deterioration.
+
+## Solution
+
+Each server periodically sends a heartbeat message to a central monitoring server or other servers in the system to show that it is still alive and functioning.
+
+Heartbeating is one of the mechanisms for detecting failures in a distributed system. If there is a central server, all servers periodically send a heartbeat message to it. If there is no central server, all servers randomly choose a set of servers and send them a heartbeat message every few seconds. This way, if no heartbeat message is received from a server for a while, the system can suspect that the server might have crashed. If there is no heartbeat within a configured timeout period, the system can conclude that the server is not alive anymore and stop sending requests to it and start working on its replacement.
+
+# Checksum (New)
+
+## Background
+
+In a distributed system, while moving data between components, it is possible that the data fetched from a node may arrive corrupted. This corruption can occur because of faults in a storage device, network, software, etc. How can a distributed system ensure data integrity, so that the client receives an error instead of corrupt data?
+
+## Solution
+
+Calculate a checksum and store it with data.
+
+To calculate a checksum, a cryptographic hash function like MD5, SHA-1, SHA-256, or SHA-512 is used. The hash function takes the input data and produces a string (containing letters and numbers) of fixed length; this string is called the checksum.
+
+When a system is storing some data, it computes a checksum of the data and stores the checksum with the data. When a client retrieves data, it verifies that the data it received from the server matches the checksum stored. If not, then the client can opt to retrieve that data from another replica.
 
