@@ -28,6 +28,8 @@ With horizontal-scaling it is often easier to scale dynamically by adding more m
 
 Good examples of horizontal scaling are Cassandra and MongoDB as they both provide an easy way to scale horizontally by adding more machines to meet growing needs. Similarly, a good example of vertical scaling is MySQL as it allows for an easy way to scale vertically by switching from smaller to bigger machines. However, this process often involves downtime.
 
+<img width="778" alt="Screenshot 2023-01-11 at 4 45 30 PM" src="https://user-images.githubusercontent.com/33375484/211792740-eebda83a-f50e-4830-84d4-0d050c5dde83.png">
+
 ## Reliability
 
 By definition, reliability is the probability a system will fail in a given period. In simple terms, a distributed system is considered reliable if it keeps delivering its services even when one or several of its software or hardware components fail. Reliability represents one of the main characteristics of any distributed system, since in such systems any failing machine can always be replaced by another healthy one, ensuring the completion of the requested task.
@@ -66,11 +68,16 @@ Load Balancer (LB) is another critical component of any distributed system. It h
 
 Typically a load balancer sits between the client and the server accepting incoming network and application traffic and distributing the traffic across multiple backend servers using various algorithms. By balancing application requests across multiple servers, a load balancer reduces individual server load and prevents any one application server from becoming a single point of failure, thus improving overall application availability and responsiveness.
 
+
+<img width="844" alt="Screenshot 2023-01-11 at 4 47 35 PM" src="https://user-images.githubusercontent.com/33375484/211793059-bfbd9344-95d3-45b1-b46f-25986f82a58c.png">
+
 To utilize full scalability and redundancy, we can try to balance the load at each layer of the system. We can add LBs at three places:
 
 - Between the user and the web server
 - Between web servers and an internal platform layer, like application servers or cache servers
 - Between internal platform layer and database.
+
+<img width="934" alt="Screenshot 2023-01-11 at 4 47 46 PM" src="https://user-images.githubusercontent.com/33375484/211793075-8e9d77e8-713f-4efa-b0b4-4dd0a3c238f7.png">
 
 ## Benefits of Load Balancing
 
@@ -99,6 +106,8 @@ There is a variety of load balancing methods, which use different algorithms for
 ## Redundant Load Balancers
 
 The load balancer can be a single point of failure; to overcome this, a second load balancer can be connected to the first to form a cluster. Each LB monitors the health of the other and, since both of them are equally capable of serving traffic and failure detection, in the event the main load balancer fails, the second load balancer takes over.
+
+<img width="905" alt="Screenshot 2023-01-11 at 4 47 59 PM" src="https://user-images.githubusercontent.com/33375484/211793108-f9c3799a-d906-4b46-9f6f-10b1e446fb74.png">
 
 # Caching
 
@@ -207,6 +216,8 @@ A library catalog is a register that contains the list of books found in a libra
 
 Simply saying, an index is a data structure that can be perceived as a table of contents that points us to the location where actual data lives. So when we create an index on a column of a table, we store that column and a pointer to the whole row in the index. Let’s assume a table containing a list of books, the following diagram shows how an index on the ‘Title’ column looks like:
 
+<img width="859" alt="Screenshot 2023-01-11 at 4 51 19 PM" src="https://user-images.githubusercontent.com/33375484/211793706-fd801453-4dab-4752-a0a0-f84432f099a2.png">
+
 Just like a traditional relational data store, we can also apply this concept to larger datasets. The trick with indexes is that we must carefully consider how users will access the data. In the case of data sets that are many terabytes in size, but have very small payloads (e.g., 1 KB), indexes are a necessity for optimizing data access. Finding a small payload in such a large dataset can be a real challenge, since we can’t possibly iterate over that much data in any reasonable time. Furthermore, it is very likely that such a large data set is spread over several physical devices—this means we need some way to find the correct physical location of the desired data. Indexes are the best way to do this.
 
 ### How do Indexes decrease write performance?
@@ -221,6 +232,9 @@ When adding rows or making updates to existing rows for a table with an active i
 
 A proxy server is an intermediate piece of software or hardware that sits between the client and the server. Clients connect to a proxy to make a request for a service like a web page, file, or connection from the server. Essentially, a proxy server (aka the forward proxy) is a piece of software or hardware that facilitates the request for resources from other servers on behalf of clients, thus anonymizing the client from the server.
 
+
+<img width="844" alt="Screenshot 2023-01-11 at 4 52 56 PM" src="https://user-images.githubusercontent.com/33375484/211794056-b11c1da6-716d-461b-bdec-e83a3889d3d3.png">
+
 Typically, forward proxies are used to cache data, filter requests, log requests, or transform requests (by adding/removing headers, encrypting/decrypting, or compressing a resource).
 
     A forward proxy can hide the identity of the client from the server by sending requests on behalf of the client.
@@ -230,6 +244,8 @@ In addition to coordinating requests from multiple servers, proxies can also opt
 ## Reverse Proxy
 
 A reverse proxy retrieves resources from one or more servers on behalf of a client. These resources are then returned to the client, appearing as if they originated from the proxy server itself, thus anonymizing the server. Contrary to the forward proxy, which hides the client’s identity, a reverse proxy hides the server’s identity.
+
+<img width="914" alt="Screenshot 2023-01-11 at 4 53 09 PM" src="https://user-images.githubusercontent.com/33375484/211794067-e2d2d72b-17e0-4ae2-96b6-578ff4b68334.png">
 
 In the above diagram, the reverse proxy hides the final server that served the request from the client. The client makes a request for some content from facebook.com; this request is served by facebook’s reverse proxy server, which gets the response from one of the backend servers and returns it to the client.
 
@@ -244,6 +260,9 @@ A proxy is a piece of software or hardware that sits between a client and a serv
 **Redundancy** is the duplication of critical components or functions of a system with the intention of increasing the reliability of the system, usually in the form of a backup or fail-safe, or to improve actual system performance. For example, if there is only one copy of a file stored on a single server, then losing that server means losing the file. Since losing data is seldom a good thing, we can create duplicate or redundant copies of the file to solve this problem.
 
 Redundancy plays a key role in removing the single points of failure in the system and provides backups if needed in a crisis. For example, if we have two instances of a service running in production and one fails, the system can failover to the other one.
+
+
+<img width="1000" alt="Screenshot 2023-01-11 at 4 54 55 PM" src="https://user-images.githubusercontent.com/33375484/211794395-b73edf64-f383-49ad-8ca9-e441cb996351.png">
 
 
 **Replication** means sharing information to ensure consistency between redundant resources, such as software or hardware components, to improve reliability, fault-tolerance, or accessibility.
@@ -329,6 +348,8 @@ CAP theorem states that it is impossible for a distributed system to simultaneou
 
 According to the CAP theorem, any distributed system needs to pick two out of the three properties. The three options are CA, CP, and AP. However, CA is not really a coherent option, as a system that is not partition-tolerant will be forced to give up either Consistency or Availability in the case of a network partition. Therefore, the theorem can really be stated as: **In the presence of a network partition, a distributed system must choose either Consistency or Availability.**
 
+<img width="885" alt="Screenshot 2023-01-11 at 4 56 07 PM" src="https://user-images.githubusercontent.com/33375484/211794629-9fa1edca-3ff0-4297-b8cd-568253deb78b.png">
+
 We cannot build a general data store that is continually available, sequentially consistent, and tolerant to any partition failures. We can only build a system that has any two of these three properties. Because, to be consistent, all nodes should see the same set of updates in the same order. But if the network loses a partition, updates in one partition might not make it to the other partitions before a client reads from the out-of-date partition after having read from the up-to-date one. The only thing that can be done to cope with this possibility is to stop serving requests from the out-of-date partition, but then the service is no longer 100% available.
 
 # PACELC Theorem (New)
@@ -345,6 +366,9 @@ The PACELC theorem states that in a system that replicates data:
 
 - if there is a partition (‘P’), a distributed system can tradeoff between availability and consistency (i.e., ‘A’ and ‘C’);
 - else (‘E’), when the system is running normally in the absence of partitions, the system can tradeoff between latency (‘L’) and consistency (‘C’).
+
+
+<img width="887" alt="Screenshot 2023-01-11 at 4 57 07 PM" src="https://user-images.githubusercontent.com/33375484/211794821-4f808abd-2581-4364-bbe3-a36e9aeb7617.png">
 
 The first part of the theorem (PAC) is the same as the CAP theorem, and the ELC is the extension. The whole thesis is assuming we maintain high availability by replication. So, when there is a failure, CAP theorem prevails. But if not, we still have to consider the tradeoff between consistency and latency of a replicated system.
 
@@ -377,6 +401,8 @@ As stated above, the act of distributing data across a set of nodes is called da
 
 A naive approach will use a suitable hash function to map the data key to a number. Then, find the server by applying modulo on this number and the total number of servers. For example:
 
+<img width="889" alt="Screenshot 2023-01-11 at 5 05 29 PM" src="https://user-images.githubusercontent.com/33375484/211796593-01fd7f38-1ad4-429f-8314-395a8d400def.png">
+
 The scheme described in the above diagram solves the problem of finding a server for storing/retrieving the data. But when we add or remove a server, all our existing mappings will be broken. This is because the total number of servers will be changed, which was used to find the actual server storing the data. So to get things working again, we have to remap all the keys and move our data based on the new server count, which will be a complete mess!
 
 ## Consistent Hashing to the rescue
@@ -385,14 +411,23 @@ Distributed systems can use Consistent Hashing to distribute data across nodes. 
 
 Consistent Hashing stores the data managed by a distributed system in a ring. Each node in the ring is assigned a range of data. Here is an example of the consistent hash ring:
 
+
+<img width="931" alt="Screenshot 2023-01-11 at 5 05 38 PM" src="https://user-images.githubusercontent.com/33375484/211796609-cc5880f0-c4f3-4926-b7ea-5f616a8a54c6.png">
+
 With consistent hashing, the ring is divided into smaller, predefined ranges. Each node is assigned one of these ranges. The start of the range is called a token. This means that each node will be assigned one token. The range assigned to each node is computed as follows:
 
 **Range start:**  Token value
+
 **Range end:**   Next token value - 1
 
 Here are the tokens and data ranges of the four nodes described in the above diagram:
 
+
+<img width="642" alt="Screenshot 2023-01-11 at 5 05 47 PM" src="https://user-images.githubusercontent.com/33375484/211796626-735d772c-d537-4662-afff-e6e75f35af5f.png">
+
 Whenever the system needs to read or write data, the first step it performs is to apply the **MD5 hashing algorithm** to the key. The output of this hashing algorithm determines within which range the data lies and hence, on which node the data will be stored. As we saw above, each node is supposed to store data for a fixed range. Thus, the hash generated from the key tells us the node where the data will be stored.
+
+<img width="996" alt="Screenshot 2023-01-11 at 5 05 56 PM" src="https://user-images.githubusercontent.com/33375484/211796635-0664096f-1e3c-4511-861f-20ecd831b008.png">
 
 The Consistent Hashing scheme described above works great when a node is added or removed from the ring, as in these cases, since only the next node is affected. For example, when a node is removed, the next node becomes responsible for all of the keys stored on the outgoing node. However, this scheme can result in non-uniform data and load distribution. This problem can be solved with the help of Virtual nodes.
 
@@ -408,7 +443,13 @@ As we saw above, the basic Consistent Hashing algorithm assigns a single token (
 
 To handle these issues, Consistent Hashing introduces a new scheme of distributing the tokens to physical nodes. Instead of assigning a single token to a node, the hash range is divided into multiple smaller ranges, and each physical node is assigned several of these smaller ranges. Each of these subranges is considered a Vnode. With Vnodes, instead of a node being responsible for just one token, it is responsible for many tokens (or subranges).
 
+
+<img width="927" alt="Screenshot 2023-01-11 at 5 06 05 PM" src="https://user-images.githubusercontent.com/33375484/211796692-b22abfda-40b7-450a-8ec8-966d01c89f04.png">
+
 Practically, Vnodes are randomly distributed across the cluster and are generally non-contiguous so that no two neighboring Vnodes are assigned to the same physical node or rack. Additionally, nodes do carry replicas of other nodes for fault tolerance. Also, since there can be heterogeneous machines in the clusters, some servers might hold more Vnodes than others. The figure below shows how physical nodes A, B, C, D, & E use Vnodes of the Consistent Hash ring. Each physical node is assigned a set of Vnodes and each Vnode is replicated once.
+
+
+<img width="825" alt="Screenshot 2023-01-11 at 5 06 13 PM" src="https://user-images.githubusercontent.com/33375484/211796718-ed9c5caf-c499-4ca4-b1ba-6232f9a034a0.png">
 
 ## Advantages of Vnodes
 
@@ -427,6 +468,9 @@ To ensure highly availability and durability, Consistent Hashing replicates each
 Each key is assigned to a coordinator node (generally the first node that falls in the hash range), which first stores the data locally and then replicates it to N−1 clockwise successor nodes on the ring. This results in each node owning the region on the ring between it and its NthNth predecessor. In an eventually consistent system, this replication is done asynchronously (in the background).
 
     In eventually consistent systems, copies of data don’t always have to be identical as long as they are designed to eventually become consistent. In distributed systems, eventual consistency is used to achieve high availability.
+    
+
+<img width="876" alt="Screenshot 2023-01-11 at 5 06 24 PM" src="https://user-images.githubusercontent.com/33375484/211796734-839e4630-d20e-4e0a-85f2-e990372aaa4a.png">
 
 ## Consistent Hashing in System Design Interviews
 
@@ -449,6 +493,8 @@ Long-Polling, WebSockets, and Server-Sent Events are popular communication proto
 - The server calculates the response.
 - The server sends the response back to the client on the opened request.
 
+<img width="800" alt="Screenshot 2023-01-11 at 5 01 03 PM" src="https://user-images.githubusercontent.com/33375484/211795688-4fb78ce5-863a-4023-9811-8b7b3b69a662.png">
+
 ## Ajax Polling
 
 Polling is a standard technique used by the vast majority of AJAX applications. The basic idea is that the client repeatedly polls (or requests) a server for data. The client makes a request and waits for the server to respond with data. If no data is available, an empty response is returned.
@@ -459,6 +505,8 @@ Polling is a standard technique used by the vast majority of AJAX applications.
 - The client repeats the above three steps periodically to get updates from the server.
 
 The problem with Polling is that the client has to keep asking the server for any new data. As a result, a lot of responses are empty, creating HTTP overhead.
+
+<img width="795" alt="Screenshot 2023-01-11 at 5 01 14 PM" src="https://user-images.githubusercontent.com/33375484/211795717-65112083-3b3a-468e-936e-ab2143f7de70.png">
 
 ## HTTP Long-Polling
 
@@ -475,9 +523,13 @@ The basic life cycle of an application using HTTP Long-Polling is as follows:
 - The client typically sends a new long-poll request, either immediately upon receiving a response or after a pause to allow an acceptable latency period.
 - Each Long-Poll request has a timeout. The client has to reconnect periodically after the connection is closed due to timeouts.
 
+<img width="754" alt="Screenshot 2023-01-11 at 5 01 23 PM" src="https://user-images.githubusercontent.com/33375484/211795738-749e4a9c-72b5-4dd8-a82e-b6a9acec1b35.png">
+
 ## WebSockets
 
 WebSocket provides Full duplex communication channels over a single TCP connection. It provides a persistent connection between a client and a server that both parties can use to start sending data at any time. The client establishes a WebSocket connection through a process known as the WebSocket handshake. If the process succeeds, then the server and client can exchange data in both directions at any time. The WebSocket protocol enables communication between a client and a server with lower overheads, facilitating real-time data transfer from and to the server. This is made possible by providing a standardized way for the server to send content to the browser without being asked by the client and allowing for messages to be passed back and forth while keeping the connection open. In this way, a two-way (bi-directional) ongoing conversation can take place between a client and a server.
+
+<img width="690" alt="Screenshot 2023-01-11 at 5 01 32 PM" src="https://user-images.githubusercontent.com/33375484/211795765-f7939604-bee7-4e0c-8163-203c844c0a2e.png">
 
 ## Server-Sent Events (SSEs)
 
@@ -488,6 +540,8 @@ Under SSEs the client establishes a persistent and long-term connection with the
 - The server sends the data to the client whenever there’s new information available.
 
 SSEs are best when we need real-time traffic from the server to the client or if the server is generating data in a loop and will be sending multiple events to the client.
+
+<img width="696" alt="Screenshot 2023-01-11 at 5 01 39 PM" src="https://user-images.githubusercontent.com/33375484/211795792-d2ec073c-cb53-41d7-9b46-9ad45729d522.png">
 
 # Bloom Filters (New)
 
@@ -507,6 +561,9 @@ The Bloom filter data structure tells whether an element may be in a set, or def
     - If all are 1, then the element may be in the set.
 
 Here is a Bloom filter with three elements P, Q, and R. It consists of 20 bits and uses three hash functions. The colored arrows point to the bits that the elements of the set are mapped to.
+
+
+<img width="894" alt="Screenshot 2023-01-11 at 4 58 32 PM" src="https://user-images.githubusercontent.com/33375484/211795101-d51f5fe0-aea5-421a-bc35-5b082c28352c.png">
 
 
 - The element X definitely is not in the set, since it hashes to a bit position containing 0.
@@ -559,6 +616,9 @@ Distributed systems keep multiple copies of data for fault tolerance and higher 
 Allow only a single server (called leader) to be responsible for data replication and to coordinate work.
 
 At any time, one server is elected as the leader. This leader becomes responsible for data replication and can act as the central point for all coordination. The followers only accept writes from the leader and serve as a backup. In case the leader fails, one of the followers can become the leader. In some cases, the follower can serve read requests for load balancing.
+
+
+<img width="877" alt="Screenshot 2023-01-11 at 4 59 25 PM" src="https://user-images.githubusercontent.com/33375484/211795276-330a72b1-3465-4d39-971b-0bc3ab6f37e6.png">
 
 # Heartbeat (New)
 
